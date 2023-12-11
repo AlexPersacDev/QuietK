@@ -4,47 +4,49 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    CharacterController playerController;
-    [SerializeField] float speed;
-    [SerializeField] Transform cameraTransform;
-    float turnSmoothVelocity;
-    float turnSmoothTime = 0.1f;
+    CharacterController playerController; 
+    [SerializeField] float speed; //velocidad de jugador
+    [SerializeField] Transform cameraTransform; 
+    Vector3 movDirection;
+    Vector3 yMovement;
+    float h, v;
+
+    [Header("Jump")]
+    [SerializeField] float gravitySacle;
 
     void Start()
     {
         playerController = GetComponent<CharacterController>();
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
     {
-        //PlayerMovement();
-        float axisH = Input.GetAxisRaw("Horizontal");
-        float axisV = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(axisH, 0, axisV).normalized;
-        if (direction.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z) * Mathf.Rad2Deg * cameraTransform.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
-
-            Vector3 movDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            playerController.Move(movDirection.normalized * speed * Time.deltaTime);
-        }
+        h = Input.GetAxisRaw("Horizontal");
+        v = Input.GetAxisRaw("Vertical");
+        movDirection = cameraTransform.forward * v + cameraTransform.right * h;
+        movDirection.y = 0;
+        CameraRotation();
+        PlayerMovement();
     }
 
     void PlayerMovement()
     {
-        float axisH = Input.GetAxisRaw("Horizontal");
-        float axisV = Input.GetAxisRaw("Vertical");
-        Vector3 direction = new Vector3(axisH, 0, axisV).normalized;
-        if (direction.magnitude >= 0.1f)
-        {
-            float targetAngle = Mathf.Atan2(direction.x, direction.z  ) * Mathf.Rad2Deg * cameraTransform.eulerAngles.y;
-            float angle = Mathf.SmoothDampAngle(transform.eulerAngles.y, targetAngle, ref turnSmoothVelocity, turnSmoothTime);
-            transform.rotation = Quaternion.Euler(0f, angle, 0f);
+        playerController.Move(movDirection.normalized * speed * Time.deltaTime);
+    }
 
-            Vector3 movDirection = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
-            playerController.Move(movDirection.normalized * speed * Time.deltaTime);
-        }
+    void CameraRotation()
+    {
+        float angle = Mathf.Atan2(movDirection.x, movDirection.z) * Mathf.Rad2Deg;
+        transform.eulerAngles = new Vector3(0, angle, 0);
+    }
+
+    void AplicarGravedad()
+    {
+        yMovement.y += gravitySacle * Time.deltaTime; //La gravedad se va incrementando cada frame.
+
+        playerController.Move(yMovement * Time.deltaTime); //Muevo al controller en el eje Y basandome en esa gravedad.
+
     }
 }
