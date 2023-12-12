@@ -23,11 +23,27 @@ public class Enemy : MonoBehaviour
         Vector3 direcionGlobalMovimiento = Vector3.forward * v + Vector3.right * h;
         controller.Move(direcionGlobalMovimiento.normalized * velocidadMovimiento * Time.deltaTime);
 
-        if (h > 0 || v > 0)
+        if (h > 0)
         {
-            Debug.Log("ESTOY MOVIENDOME");
+            Debug.Log("ME MUEVO EN H POSITIVO");
+            transform.Rotate(Vector3.back * angularSpeed * Time.deltaTime);
+        }
+        else if (h < 0)
+        {
+            Debug.Log("ME MUEVO EN H NEGATIVO");
+            transform.Rotate(Vector3.forward * angularSpeed * Time.deltaTime);
+        }
+
+        if (v > 0)
+        {
+            Debug.Log("ME MUEVO EN V POSITIVO");
             transform.Rotate(Vector3.right * angularSpeed * Time.deltaTime);
         }
+
+        //if (h == 0)
+        //{
+
+        //}
         
     }
 }
