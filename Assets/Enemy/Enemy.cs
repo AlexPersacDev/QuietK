@@ -10,13 +10,14 @@ public class Limites
 public class Enemy : MonoBehaviour
 {
     [Header("VIDEO YOUTUBE")]
-    Rigidbody gravedad;
+    Rigidbody rb;
     public float inclinacion;
     public Limites limites;
 
 
     CharacterController controller;
     [SerializeField] float velocidadMovimiento;
+    [SerializeField] float fuerzaSalto;
     [SerializeField] float velocidadRotacion;
     [SerializeField] Vector3 rotacionMov;
     float h, v;
@@ -24,7 +25,7 @@ public class Enemy : MonoBehaviour
     void Start()
     {
         controller = GetComponent<CharacterController>();
-        gravedad = GetComponent<Rigidbody>();
+        rb = GetComponent<Rigidbody>();
     }
 
     // Update is called once per frame
@@ -32,6 +33,7 @@ public class Enemy : MonoBehaviour
     {
 
         //RotacionEnemigo(rotacionMov, 200);
+        Saltar();
 
     }
 
@@ -41,7 +43,7 @@ public class Enemy : MonoBehaviour
         v = Input.GetAxis("Vertical");
 
         Vector3 movimiento = new Vector3(h, 0, v);
-        gravedad.velocity = movimiento * velocidadMovimiento;
+        rb.velocity = movimiento * velocidadMovimiento;
 
         if (h > 0)
         {
@@ -50,9 +52,18 @@ public class Enemy : MonoBehaviour
         if (v > 0)
         {
             Debug.Log(v);
-            gravedad.rotation = Quaternion.Euler(0, 0, gravedad.velocity.x * -inclinacion);
+            rb.rotation = Quaternion.Euler(0, 0, rb.velocity.x * -inclinacion);
         }
         
+    }
+
+    void Saltar()
+    {
+        if (Input.GetKey(KeyCode.Space))
+        {
+            rb.AddForce(new Vector3(0, 1, 0) * fuerzaSalto, ForceMode.Impulse);
+
+        }
     }
 
     void RotacionEnemigo(Vector3 target, float smooth)
