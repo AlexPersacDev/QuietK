@@ -16,7 +16,17 @@ public class Player : MonoBehaviour, Idamagable
     [SerializeField] GameObject visualPlayer;
     Vector3 movDirection;
     float h, v;
-    Quaternion quaternion;
+
+    [Header("Rotation")]
+    [SerializeField] float rotationSpeed;
+    Quaternion rotGoal;
+    Vector3 direction;
+    //[SerializeField] float rotationSmoothness;
+    //float rotationFriction = 1;
+    //float resultingValueInput;
+    //Quaternion quaternionRotateFrom;
+    //Quaternion quaternionRotateTo;
+    //float maxAndMinYRotation = 90;
 
     [Header("Jump")]
     [SerializeField] float jumpForce;
@@ -35,11 +45,12 @@ public class Player : MonoBehaviour, Idamagable
     {
         h = Input.GetAxisRaw("Horizontal");
         v = Input.GetAxisRaw("Vertical");
-        movDirection = cameraTransform.forward * v + cameraTransform.right * h;
-        //quaternion = Quaternion.Euler(new Vector3(-90, 0f, cameraTransform.rotation.y));
-        //visualPlayer.transform.rotation = quaternion;
+        movDirection = transform.forward * v + transform.right * h;
+
         RortateWithCameraY();
-        Debug.Log(quaternion);
+        LerpRotation();
+        //SlerpRotation();
+
         Jump();//salto
         CheckInGround();//chequeo de suelo
     }
@@ -80,9 +91,28 @@ public class Player : MonoBehaviour, Idamagable
         }
     }
 
-    void RortateWithCameraY()
+    void RortateWithCameraY() //retocar cuando ROBER pase el nuevo modelo del mono
     {
-        visualPlayer.transform.localEulerAngles = new Vector3(-90, 0f, cameraTransform.eulerAngles.y);
+        //visualPlayer.transform.localEulerAngles = new Vector3(-90, 0f, cameraTransform.eulerAngles.y);
+        transform.localEulerAngles = new Vector3(0, cameraTransform.eulerAngles.y, 0f);
+    }
+
+    void SlerpRotation()
+    {
+        direction = movDirection;
+        rotGoal = Quaternion.LookRotation(direction);
+        visualPlayer.transform.rotation = Quaternion.Slerp(visualPlayer.transform.rotation, rotGoal, rotationSpeed);
+    }
+    
+    void LerpRotation()
+    {
+        if (h != 0)
+        {
+            direction = movDirection;
+            rotGoal = Quaternion.LookRotation(direction);
+            visualPlayer.transform.rotation = Quaternion.Lerp(visualPlayer.transform.rotation, rotGoal, Time.deltaTime * rotationSpeed);
+        }
+        
     }
 
     void Idamagable.Damagable()// metodo que dañará al jugador
