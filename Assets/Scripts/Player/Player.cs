@@ -8,10 +8,12 @@ public class Player : MonoBehaviour, Idamagable
     [SerializeField] Transform cameraTransform; 
 
     [Header("Player Stats")]
-    [SerializeField] float speed; //velocidad de jugador
     [SerializeField] int lifes;
+    [SerializeField] int damage;
 
-    //movimiento
+    [Header("Movement")]
+    [SerializeField] float speed; //velocidad de jugador
+    [SerializeField] GameObject visualPlayer;
     Vector3 movDirection;
     float h, v;
     Quaternion quaternion;
@@ -34,8 +36,10 @@ public class Player : MonoBehaviour, Idamagable
         h = Input.GetAxisRaw("Horizontal");
         v = Input.GetAxisRaw("Vertical");
         movDirection = cameraTransform.forward * v + cameraTransform.right * h;
-        quaternion = Quaternion.Euler(0f, cameraTransform.rotation.y, 0f);
-        transform.rotation = quaternion;
+        //quaternion = Quaternion.Euler(new Vector3(-90, 0f, cameraTransform.rotation.y));
+        //visualPlayer.transform.rotation = quaternion;
+        RortateWithCameraY();
+        Debug.Log(quaternion);
         Jump();//salto
         CheckInGround();//chequeo de suelo
     }
@@ -74,6 +78,11 @@ public class Player : MonoBehaviour, Idamagable
         {
             rbPlayer.velocity = Vector3.ClampMagnitude(rbPlayer.velocity, speed);
         }
+    }
+
+    void RortateWithCameraY()
+    {
+        visualPlayer.transform.localEulerAngles = new Vector3(-90, 0f, cameraTransform.eulerAngles.y);
     }
 
     void Idamagable.Damagable()// metodo que dañará al jugador
